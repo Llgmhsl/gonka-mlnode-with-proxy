@@ -71,7 +71,7 @@ jobs:
           tags: |
             type=ref,event=branch,suffix=-${{ steps.base_version.outputs.base_version }}
             type=ref,event=pr,suffix=-${{ steps.base_version.outputs.base_version }}
-            type=sha,prefix={{branch}}-${{ steps.base_version.outputs.base_version }}-
+            type=sha,suffix=-${{ steps.base_version.outputs.base_version }}
             type=semver,pattern={{version}}-${{ steps.base_version.outputs.base_version }}
             type=semver,pattern={{major}}.{{minor}}-${{ steps.base_version.outputs.base_version }}
             type=raw,value=latest-${{ steps.base_version.outputs.base_version }},enable={{is_default_branch}}
