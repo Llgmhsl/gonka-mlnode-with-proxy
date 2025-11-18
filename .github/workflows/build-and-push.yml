@@ -10,6 +10,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  DOCKERHUB_USERNAME: korchasa
 
 jobs:
   build-and-push:
@@ -56,15 +57,21 @@ jobs:
           echo "After cleanup:"
           df -h
 
-      - name: Log in to Container Registry
+      - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata
-        id: meta
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Extract metadata for GHCR
+        id: meta-ghcr
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
@@ -77,13 +84,29 @@ jobs:
             type=raw,value=latest-${{ steps.base_version.outputs.base_version }},enable={{is_default_branch}}
             type=raw,value=${{ steps.base_version.outputs.base_version }},enable={{is_default_branch}}
 
+      - name: Extract metadata for Docker Hub
+        id: meta-dockerhub
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKERHUB_USERNAME }}/${{ github.event.repository.name }}
+          tags: |
+            type=ref,event=branch,suffix=-${{ steps.base_version.outputs.base_version }}
+            type=ref,event=pr,suffix=-${{ steps.base_version.outputs.base_version }}
+            type=sha,suffix=-${{ steps.base_version.outputs.base_version }}
+            type=semver,pattern={{version}}-${{ steps.base_version.outputs.base_version }}
+            type=semver,pattern={{major}}.{{minor}}-${{ steps.base_version.outputs.base_version }}
+            type=raw,value=latest-${{ steps.base_version.outputs.base_version }},enable={{is_default_branch}}
+            type=raw,value=${{ steps.base_version.outputs.base_version }},enable={{is_default_branch}}
+
       # Standard image (standard compression, all tags from metadata-action)
-      - name: Build and push Docker image (standard)
+      - name: Build and push Docker image to GHCR and Docker Hub
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: |
+            ${{ steps.meta-ghcr.outputs.tags }}
+            ${{ steps.meta-dockerhub.outputs.tags }}
+          labels: ${{ steps.meta-ghcr.outputs.labels }}
           build-args: |
             BASE_IMAGE_VERSION=${{ steps.base_version.outputs.base_version }}
