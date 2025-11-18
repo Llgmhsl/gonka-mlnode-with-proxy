@@ -5,8 +5,8 @@ This container targets environments where only Docker deployment is available (R
 Key characteristics:
 
 - Base image remains `mlnode`, so all CUDA/Python tooling from upstream is available out of the box.
-- We do **not** change the upstream entrypoint — all environment preparation (user `appuser`, `PYTHONPATH`, etc.) remains as in the original image.
-- Nginx and uvicorn are started with a single line in `CMD`: Nginx runs in the background, uvicorn runs in the foreground.
+- We use a lightweight `start.sh` instead of the upstream entrypoint: it activates venv, sets the correct `PYTHONPATH` and runs `nginx` and `uvicorn`.
+- Upstream entrypoint is disabled to avoid double execution and differences between providers.
 
 ## Usage
 
@@ -60,11 +60,10 @@ Nginx access logs include host and port information in the format: `host:port [t
 
 Container process tree is very simple:
 
-- PID 1 — upstream entrypoint from `mlnode` (creates user, sets environment variables, etc.).
-- Child — `bash -lc "nginx -g 'daemon off;' & ${UVICORN_CMD}"`.
-- Within this command:
-  - `nginx` runs in the background (`daemon off;`), logs go to STDOUT/STDERR via symlinks.
-  - `uvicorn` runs in the foreground and is the main container process.
+- PID 1 — `/start.sh` (minimal start script):
+  - activates venv (`/app/packages/api/.venv`);
+  - sets `PYTHONPATH` with paths `/app`, `/app/packages/api/src`, `/app/packages/common/src`;
+  - runs `nginx` in background and `uvicorn` in foreground.
 
 ## Health Check
 
@@ -78,11 +77,10 @@ Health check script validates connectivity to all four service ports using curl 
 
 ## Environment Variables
 
-| Variable     | Default                                          | Description                                    |
-|--------------|--------------------------------------------------|------------------------------------------------|
-| `UVICORN_CMD`| `uvicorn api.app:app --host=0.0.0.0 --port=8000` | Command executed inside the uvicorn service    |
-| `NGINX_CMD`  | `nginx -g 'daemon off;'`                         | Command executed inside the nginx service      |
-| `HF_HOME`    | `~/.cache`                                       | HuggingFace cache root (forwarded to uvicorn)  |
+| Variable     | Default (internal)                                | Description                                    |
+|--------------|---------------------------------------------------|------------------------------------------------|
+| `HF_HOME`    | `~/.cache`                                        | HuggingFace cache root (forwarded to uvicorn)  |
+| `UVICORN_CMD`| `uvicorn api.app:app --host=0.0.0.0 --port=8000`  | Optional override for uvicorn command          |
 
 Example (custom uvicorn port and HuggingFace cache):
 

@@ -26,5 +26,10 @@ RUN chmod +x /healthcheck.sh
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD /healthcheck.sh
 
-ENV UVICORN_CMD="uvicorn api.app:app --host=0.0.0.0 --port=8000"
-CMD ["bash", "-lc", "nginx -g 'daemon off;' & ${UVICORN_CMD}"]
+# Start script: activates venv, sets PYTHONPATH, runs nginx + uvicorn
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
+
+# Do not inherit upstream entrypoint to avoid double execution
+ENTRYPOINT []
+CMD ["/start.sh"]
