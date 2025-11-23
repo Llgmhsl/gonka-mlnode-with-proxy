@@ -1,4 +1,4 @@
-ARG BASE_IMAGE_VERSION=3.0.10
+ARG BASE_IMAGE_VERSION=3.0.11
 FROM ghcr.io/product-science/mlnode:${BASE_IMAGE_VERSION}
 
 ENV DEBIAN_FRONTEND=noninteractive
