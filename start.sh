@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 # --- Original-like entrypoint steps (idempotent) ---
 HOST_UID=${HOST_UID:-1000}
