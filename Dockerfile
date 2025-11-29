@@ -7,6 +7,10 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         nginx \
         gettext-base \
+        screen \
+        htop \
+        ssh \
+        iputils-ping \
         curl \
     && rm -rf /var/lib/apt/lists/*
 
