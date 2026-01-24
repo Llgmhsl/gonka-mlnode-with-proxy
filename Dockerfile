@@ -1,5 +1,5 @@
 ARG BASE_IMAGE_VERSION=3.0.11-post1
-FROM ghcr.io/product-science/mlnode:${BASE_IMAGE_VERSION}
+FROM crpi-qg1yhjomg7p16evn.cn-chengdu.personal.cr.aliyuncs.com/mhsl/mlnode:${BASE_IMAGE_VERSION}
 
 ENV DEBIAN_FRONTEND=noninteractive
 
