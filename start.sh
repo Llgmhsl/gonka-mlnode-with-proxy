@@ -36,7 +36,7 @@ else
 fi
 
 # --- Compose uvicorn command (can be overridden via env) ---
-UVICORN_CMD_DEFAULT="uvicorn api.app:app --host=0.0.0.0 --port=8080"
+UVICORN_CMD_DEFAULT="uvicorn api.app:app --host=0.0.0.0 --port=8000"
 UVICORN_CMD="${UVICORN_CMD:-$UVICORN_CMD_DEFAULT}"
 
 # --- Start services ---
