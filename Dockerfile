@@ -36,4 +36,4 @@ COPY start.sh /root/start.sh
 RUN chmod +x start.sh
 
 # Do not inherit upstream entrypoint to avoid double execution
-ENTRYPOINT []
+CMD ["/start.sh"]
