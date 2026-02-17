@@ -33,7 +33,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 # Start script: activates venv, sets PYTHONPATH, runs nginx + uvicorn
 
 COPY start.sh /root/start.sh
-RUN chmod +x /start.sh
+RUN chmod +x start.sh
 
 # Do not inherit upstream entrypoint to avoid double execution
 ENTRYPOINT []
