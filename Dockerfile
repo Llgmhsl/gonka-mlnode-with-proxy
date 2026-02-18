@@ -1,4 +1,4 @@
-ARG BASE_IMAGE_VERSION=3.0.12-post2
+ARG BASE_IMAGE_VERSION=3.0.12-post4
 FROM crpi-qg1yhjomg7p16evn.cn-chengdu.personal.cr.aliyuncs.com/mhsl/mlnode:${BASE_IMAGE_VERSION}
 
 ENV DEBIAN_FRONTEND=noninteractive
